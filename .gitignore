@@ -1,0 +1,13 @@
+# Python 编译缓存
+__pycache__/
+*.pyc
+
+# pytest 测试缓存
+.pytest_cache/
+
+# Python 虚拟环境
+.venv/
+venv/
+
+# 环境变量和密钥
+.env
