@@ -2,8 +2,18 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
+from pathlib import Path
+from fastapi.responses import FileResponse
+
+import os
+
 #创建一个FastAPI应用，保存到app这个变量里
 app = FastAPI()
+BASE_DIR=Path(__file__).resolve().parent.parent
+
+@app.get("/",include_in_schema=False)
+def home():
+    return FileResponse(BASE_DIR/"static"/"index.html")
 
 games = {
     1: {"id": 1, "name": "Pixel Quest", "price": 49, "stock": 10},
@@ -64,3 +74,15 @@ def add_to_cart(item:CartItem):
         "game_id": item.game_id,
         "quantity": new_quantity
     }
+
+
+# 仅在测试环境启用的接口
+if os.getenv("GAME_STORE_TESTING") == "1":
+
+    @app.post("/test/reset", include_in_schema=False)
+    def reset_test_data():
+        cart.clear()
+
+        return {
+            "message": "Test data reset successfully"
+        }
