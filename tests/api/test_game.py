@@ -27,3 +27,15 @@ def test_game_not_found():
 
     assert response.status_code == 404
     assert response.json()["detail"] == "Game not found"
+
+def test_invalid_game_id():
+    response=client.get("/games/abc")
+    assert response.status_code==422
+
+def test_negative_game_id():
+    response=client.get("/game/-1")
+    assert response.status_code==404
+
+def test_zero_game_id():
+    response=client.get("/game/0")
+    assert response.status_code==404
