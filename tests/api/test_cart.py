@@ -2,17 +2,16 @@ import pytest
 from fastapi.testclient import TestClient
 from app.main import app,cart,games
 
-client=TestClient(app)
+# client=TestClient(app)
 
-@pytest.fixture(autouse=True)
-def reset_cart():
-    #每个测试开始前清空购物车
-    cart.clear()
-    yield
-    #每个测试结束后再清空
-    cart.clear()
+# def reset_cart():
+#     #每个测试开始前清空购物车
+#     cart.clear()
+#     yield
+#     #每个测试结束后再清空
+#     cart.clear()
 
-def test_add_to_cart_success():
+def test_add_to_cart_success(client):
     response=client.post(
         "/cart",
         json={"game_id":1,"quantity":2}
@@ -24,7 +23,7 @@ def test_add_to_cart_success():
 
 
 @pytest.mark.parametrize("quantity",[0,-1,6])
-def test_invalid_quantity(quantity):
+def test_invalid_quantity(quantity,client):
     response=client.post(
         "/cart",
         json={"game_id":1,"quantity":quantity}
@@ -32,7 +31,7 @@ def test_invalid_quantity(quantity):
     assert response.status_code == 422
     assert cart == {}
 
-def test_game_not_found():
+def test_game_not_found(client):
     response = client.post(
         "/cart",
         json={"game_id": 999, "quantity": 2}
@@ -42,7 +41,7 @@ def test_game_not_found():
     assert response.json()["detail"] == "Game not found"
 
 
-def test_insufficient_stock():
+def test_insufficient_stock(client):
     original_stock=games[1]["stock"]
     try:
         games[1]["stock"]=3
@@ -59,7 +58,7 @@ def test_insufficient_stock():
         games[1]["stock"] = original_stock
 
 
-def test_cumulative_quantity_limit():
+def test_cumulative_quantity_limit(client):
     first = client.post(
         "/cart",
         json={"game_id": 1, "quantity": 4}
