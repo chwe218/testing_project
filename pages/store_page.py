@@ -42,3 +42,12 @@ class StorePage:
     def add_to_cart(self, game_name: str, quantity: int):
         self.quantity_input(game_name).fill(str(quantity))
         self.add_button(game_name).click()
+
+
+    def stock_text(self, game_name: str):
+        return self.game_card(game_name).get_by_text(
+        "Stock:", exact=False
+    )
+
+    def message_text(self, game_name: str) -> str:
+        return self.message(game_name).inner_text()

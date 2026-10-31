@@ -56,9 +56,10 @@ def add_to_cart(item:CartItem):
     if new_quantity>5:
         raise HTTPException(
             status_code=400,
-            detail="Cart quantity limit exceeded"
+            detail="Cart quantity cannot exceed 5"
         )
-
+    
+        
     #检查库存
     if new_quantity>game["stock"]:
         raise HTTPException(
