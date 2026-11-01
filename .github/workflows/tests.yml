@@ -55,9 +55,12 @@ jobs:
         run: python -m playwright install --with-deps chromium
 
       - name: Start FastAPI server
+        env:
+          GAME_STORE_TESTING: "1"
         run: |
           python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 &
           echo $! > server.pid
+
 
       - name: Wait for server
         run: |
