@@ -14,3 +14,10 @@ venv/
 
 #自动生成的报告目录
 reports/
+
+
+# SQLite database files
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
