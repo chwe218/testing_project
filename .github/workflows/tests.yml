@@ -33,3 +33,48 @@ jobs:
         with:
           name: api-test-report
           path: report.html
+    
+  ui-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install fastapi uvicorn httpx requests pytest pytest-playwright playwright
+
+      - name: Install Chromium
+        run: python -m playwright install --with-deps chromium
+
+      - name: Start FastAPI server
+        run: |
+          python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 &
+          echo $! > server.pid
+
+      - name: Wait for server
+        run: |
+          python - <<'PY'
+          import time
+          import urllib.request
+
+          for attempt in range(30):
+              try:
+                  urllib.request.urlopen("http://127.0.0.1:8000/", timeout=2)
+                  print("Server is ready")
+                  break
+              except Exception:
+                  time.sleep(1)
+          else:
+              raise RuntimeError("FastAPI server failed to start")
+          PY
+
+      - name: Run Playwright UI tests
+        run: python -m pytest tests/ui/ -v --browser chromium
